@@ -139,9 +139,9 @@ static void common_init(
     ret = st7789_madctl(
         device,
         (
-          //ST7789_CFG_MIRROR_X |
+          ST7789_CFG_MIRROR_X
           //ST7789_CFG_MIRROR_Y
-          ST7789_CFG_EXCHANGE_XY
+          //ST7789_CFG_EXCHANGE_XY
           // ST7789_CFG_REFRESH_RTL
           // ST7789_CFG_REFRESH_BTT
           // ST7789_CFG_BGR

@@ -110,8 +110,8 @@ API provided by [esp32-tft](https://github.com/mvolk/esp32-tft).
 * This library's convention is that the origin (0, 0) is
   at the bottom left of the screen. The physical location
   of this corner in the default (upright) orientation is
-  closest to the "lite" pin with the x-axis extending towards
-  the ribbon cable opposite the header pins.
+  closest to the "VIN" pin with the x-axis extending towards
+  the "Lite" pin.
 
 * This library is a thin wrapper around the
   [esp32-st7789](https://github.com/mvolk/esp32-st7789)
