@@ -53,208 +53,26 @@
 #include <esp_log.h>
 
 
-#define ADAFRUIT_130_TFT_OFFSET_X 3
-#define ADAFRUIT_130_TFT_OFFSET_Y 2
+#define ADAFRUIT_130_TFT_BITDEPTH 16
+#define ADAFRUIT_130_TFT_WIDTH 240
+#define ADAFRUIT_130_TFT_HEIGHT 240
+#define ADAFRUIT_130_TFT_OFFSET_X 0
+#define ADAFRUIT_130_TFT_OFFSET_Y 0
 
 
 static const char * ADAFRUIT_130_TFT_TAG = "adafruit_130_tft";
 
 
-void adafruit_130_tft_init(st7789_device_handle_t device)
-{
-    esp_err_t ret;
-    st7789_backlight(device, ST7789_CFG_BCKL_OFF);
-    st7789_init(device, NULL);
-    st7789_hwreset(device);
-    ret = st7789_swreset(device);
-    ESP_ERROR_CHECK(ret);
-    ret = st7789_slpout(device);
-    ESP_ERROR_CHECK(ret);
-    ret = st7789_frmctr1(
-        device,
-        1,
-        44,
-        45
-    );
-    ESP_ERROR_CHECK(ret);
-    ret = st7789_frmctr2(
-        device,
-        1,
-        44,
-        45
-    );
-    ESP_ERROR_CHECK(ret);
-    ret = st7789_frmctr3(
-        device,
-        1,
-        44,
-        45
-    );
-    ESP_ERROR_CHECK(ret);
-    ret = st7789_invctr(
-        device,
-        (
-            ST7789_CFG_INV_LINE_NORM |
-            ST7789_CFG_INV_LINE_IDLE |
-            ST7789_CFG_INV_LINE_PART
-        )
-    );
-    ESP_ERROR_CHECK(ret);
-    ret = st7789_pwctr1(
-        device,
-        ST7789_CFG_GVDD_460,
-        ST7789_CFG_AVDD_500,
-        ST7789_CFG_GVCL_NEG_460,
-        ST7789_CFG_PWR_MODE_AUTO
-    );
-    ESP_ERROR_CHECK(ret);
-    ret = st7789_pwctr2(
-        device,
-        ST7789_CFG_V25_240,
-        ST7789_CFG_VGH_3_X_AVDD,
-        ST7789_CFG_VGL_NEG_100
-    );
-    ESP_ERROR_CHECK(ret);
-    ret = st7789_pwctr3(
-        device,
-        ST7789_CFG_OPAMP_I_MED_LOW,
-        ST7789_CFG_OPAMP_I_SMALL,
-        st7789_dca(
-            ST7789_CFG_BCLK_DIV_10,
-            ST7789_CFG_BCLK_DIV_10,
-            ST7789_CFG_BCLK_DIV_10,
-            ST7789_CFG_BCLK_DIV_10,
-            ST7789_CFG_BCLK_DIV_10
-        )
-    );
-    ESP_ERROR_CHECK(ret);
-    ret = st7789_pwctr4(
-        device,
-        ST7789_CFG_OPAMP_I_MED_LOW,
-        ST7789_CFG_OPAMP_I_SMALL,
-        st7789_dca(
-            ST7789_CFG_BCLK_DIV_20,
-            ST7789_CFG_BCLK_DIV_10,
-            ST7789_CFG_BCLK_DIV_20,
-            ST7789_CFG_BCLK_DIV_20,
-            ST7789_CFG_BCLK_DIV_20
-        )
-    );
-    ESP_ERROR_CHECK(ret);
-    ret = st7789_pwctr5(
-        device,
-        ST7789_CFG_OPAMP_I_MED_LOW,
-        ST7789_CFG_OPAMP_I_SMALL,
-        st7789_dca(
-            ST7789_CFG_BCLK_DIV_20,
-            ST7789_CFG_BCLK_DIV_40,
-            ST7789_CFG_BCLK_DIV_20,
-            ST7789_CFG_BCLK_DIV_40,
-            ST7789_CFG_BCLK_DIV_20
-        )
-    );
-    ESP_ERROR_CHECK(ret);
-    ret = st7789_vmctr1(device, ST7789_CFG_VCOM_NEG_0775);
-    ESP_ERROR_CHECK(ret);
-    ret = st7789_madctl(
-        device,
-        (
-          ST7789_CFG_MIRROR_X |
-          ST7789_CFG_MIRROR_Y |
-          ST7789_CFG_EXCHANGE_XY |
-          // ST7789_CFG_REFRESH_RTL
-          // ST7789_CFG_REFRESH_BTT
-          ST7789_CFG_BGR
-        )
-    );
-    ESP_ERROR_CHECK(ret);
-    ret = st7789_invoff(device);
-    ESP_ERROR_CHECK(ret);
-    ret = st7789_colmod(device, ST7789_CFG_16_BIT_COLOR);
-    ESP_ERROR_CHECK(ret);
-    ret = st7789_caset(
-        device,
-        ADAFRUIT_130_TFT_OFFSET_X,
-        127 + ADAFRUIT_130_TFT_OFFSET_X
-    );
-    ESP_ERROR_CHECK(ret);
-    ret = st7789_raset(
-        device,
-        ADAFRUIT_130_TFT_OFFSET_Y,
-        127 + ADAFRUIT_130_TFT_OFFSET_Y
-    );
-    ESP_ERROR_CHECK(ret);
-    uint8_t pos_polarity[16] = {
-      0x02, 0x1C, 0x07, 0x12,
-      0x37, 0x32, 0x29, 0x2D,
-      0x29, 0x25, 0x2B, 0x39,
-      0x00, 0x01, 0x03, 0x10,
-    };
-    ret = st7789_gmctrp1(device, pos_polarity);
-    ESP_ERROR_CHECK(ret);
-    uint8_t neg_polarity[16] = {
-      0x02, 0x1C, 0x07, 0x12,
-      0x37, 0x32, 0x29, 0x2D,
-      0x29, 0x25, 0x2B, 0x39,
-      0x00, 0x01, 0x03, 0x10,
-    };
-    ret = st7789_gmctrn1(device, neg_polarity);
-    ESP_ERROR_CHECK(ret);
-    ret = st7789_noron(device);
-    ESP_ERROR_CHECK(ret);
-    ret = st7789_dispon(device);
-    ESP_ERROR_CHECK(ret);
-    st7789_backlight(device, ST7789_CFG_BCKL_ON);
-}
-
-
-uint16_t adafruit_130_tft_rgb565(
-    uint8_t red,
-    uint8_t green,
-    uint8_t blue)
-{
-  return st7789_rgb565(red, green, blue);
-}
-
-
-esp_err_t adafruit_130_tft_paint(
-    st7789_device_handle_t device,
+static esp_err_t render(
+    tft_info_t *tft_info,
     uint16_t * buffer,
     uint8_t x0,
     uint8_t y0,
     uint8_t x1,
     uint8_t y1)
 {
-    if (x0 > x1) {
-      ESP_LOGE(
-        ADAFRUIT_130_TFT_TAG,
-        "adafruit_130_tft_paint(...) requires x0 <= x1"
-      );
-      return ESP_ERR_INVALID_ARG;
-    }
-    if (x0 > 127 || x1 > 127) {
-      ESP_LOGE(
-        ADAFRUIT_130_TFT_TAG,
-        "adafruit_130_tft_paint(...) requires x0 and x1 < 128"
-      );
-      return ESP_ERR_INVALID_ARG;
-    }
-    if (y0 > y1) {
-      ESP_LOGE(
-        ADAFRUIT_130_TFT_TAG,
-        "adafruit_130_tft_paint(...) requires y0 <= y1"
-      );
-
-    }
-    if (y0 > 127 || y1 > 127) {
-      ESP_LOGE(
-        ADAFRUIT_130_TFT_TAG,
-        "adafruit_130_tft_paint(...) requires y0 and y1 < 128"
-      );
-      return ESP_ERR_INVALID_ARG;
-    }
     return st7789_paint(
-        device,
+        (st7789_device_handle_t) tft_info->device,
         (void *) buffer,
         x0 + ADAFRUIT_130_TFT_OFFSET_X,
         x1 + ADAFRUIT_130_TFT_OFFSET_X,
@@ -263,22 +81,17 @@ esp_err_t adafruit_130_tft_paint(
     );
 }
 
-esp_err_t adafruit_130_tft_pixel(
-    st7789_device_handle_t device,
-    uint16_t * buffer,
+static esp_err_t draw_point(
+    tft_info_t *tft_info,
+    uint16_t color,
     uint8_t x,
     uint8_t y)
 {
-    if (x > 127 || y > 127) {
-      ESP_LOGE(
-        ADAFRUIT_130_TFT_TAG,
-        "adafruit_130_tft_pixel(...) requires x < 128 and y < 128"
-      );
-      return ESP_ERR_INVALID_ARG;
-    }
     esp_err_t ret;
     uint8_t xo = x + ADAFRUIT_130_TFT_OFFSET_X;
     uint8_t yo = y + ADAFRUIT_130_TFT_OFFSET_Y;
+    st7789_device_handle_t device;
+    device = (st7789_device_handle_t) tft_info->device;
     ret = st7789_caset(device, xo, xo);
     if (ret != ESP_OK) {
       ESP_LOGE(
@@ -295,7 +108,7 @@ esp_err_t adafruit_130_tft_pixel(
           esp_err_to_name(ret)
         );
       } else {
-        ret = st7789_ramwr(device, buffer, 1);
+        ret = st7789_ramwr(device, &color, 1);
         if (ret != ESP_OK) {
           ESP_LOGE(
             ADAFRUIT_130_TFT_TAG,
@@ -307,4 +120,76 @@ esp_err_t adafruit_130_tft_pixel(
     }
 
     return ret;
+}
+
+
+static void common_init(
+    tft_handle_t tft,
+    st7789_device_handle_t device)
+{
+    esp_err_t ret;
+    st7789_backlight(device, ST7789_CFG_BCKL_OFF);
+    st7789_hwreset(device);
+    ret = st7789_swreset(device);
+    ESP_ERROR_CHECK(ret);
+    ret = st7789_slpout(device);
+    ESP_ERROR_CHECK(ret);
+    ret = st7789_colmod(device, ST7789_CFG_16_BIT_COLOR);
+    ESP_ERROR_CHECK(ret);
+    ret = st7789_madctl(
+        device,
+        (
+          //ST7789_CFG_MIRROR_X |
+          //ST7789_CFG_MIRROR_Y
+          ST7789_CFG_EXCHANGE_XY
+          // ST7789_CFG_REFRESH_RTL
+          // ST7789_CFG_REFRESH_BTT
+          // ST7789_CFG_BGR
+        )
+    );
+    ESP_ERROR_CHECK(ret);
+    ret = st7789_invon(device);
+    ESP_ERROR_CHECK(ret);
+    ret = st7789_noron(device);
+    ESP_ERROR_CHECK(ret);
+    ret = st7789_dispon(device);
+    ESP_ERROR_CHECK(ret);
+    st7789_backlight(device, ST7789_CFG_BCKL_ON);
+
+    // Populate the TFT descriptor
+    tft->info.bitdepth = ADAFRUIT_130_TFT_BITDEPTH;
+    tft->info.width = ADAFRUIT_130_TFT_WIDTH;
+    tft->info.height = ADAFRUIT_130_TFT_HEIGHT;
+    tft->info.orientation = TFT_UPRIGHT;
+    tft->info.device = device;
+    tft->set_orientation = NULL;
+    tft->render16 = &render;
+    tft->draw16_point = &draw_point;
+}
+
+
+tft_handle_t adafruit_130_tft_init(
+  const st7789_params_t *params
+) {
+    st7789_device_handle_t device = st7789_init(params);
+    tft_handle_t tft = (tft_handle_t) malloc(sizeof(tft_t));
+    if (!tft) {
+        ESP_LOGE(
+            ADAFRUIT_130_TFT_TAG,
+            "Failed to allocate memory for tft descriptor"
+        );
+        esp_restart();
+    }
+    common_init(tft, device);
+    return tft;
+}
+
+
+void adafruit_130_tft_init_static(
+  const st7789_params_t *params,
+  tft_handle_t tft,
+  st7789_device_handle_t device)
+{
+    st7789_init_static(params, device);
+    common_init(tft, device);
 }
